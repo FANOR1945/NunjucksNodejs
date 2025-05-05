@@ -1,4 +1,4 @@
-import { renderDynamicAppBar } from "../render/renderDynamicAppBar.js";
+import { renderAppBar } from "../render/renderAppBar.js";
 
 
 /**
@@ -30,5 +30,5 @@ export function initAppBar(container, config = {}) {
   }
 
   // Renderizar el AppBar
-  return renderDynamicAppBar(containerElement, config);
+  return renderAppBar(containerElement, config);
 }

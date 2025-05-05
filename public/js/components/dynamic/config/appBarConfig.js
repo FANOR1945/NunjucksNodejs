@@ -1,4 +1,4 @@
-import { initLayout } from '../../../init/initLayout.js'
+
 
 // Configuración
 export const appBarConfig = {
@@ -161,19 +161,6 @@ export const appBarConfig = {
     // }
   ]
 }
-// Ejemplo 1: Usando ID
-export const layoutContent = initLayout('main-content', {
-  role: 'content',
-  columns: 2,
-  elements: [
-    {
-      type: 'text',
-      content: 'Bienvenido al sistema',
-      initialPosition: 0
-    }
-  ]
-})
-
 // Ejemplo 2: Usando clase
 
 export const layoutSidebar = {
@@ -236,12 +223,12 @@ export const layoutSidebar = {
   ]
 }
 
-// Ejemplo 3: Usando elemento DOM directamente
-const container = document.querySelector('.custom-layout-area')
-const layout3 = initLayout(container, {
-  role: 'custom',
-  nestedContainers: false,
-  styles: {
-    backgroundColor: '#f0f0f0'
-  }
-})
+// // Ejemplo 3: Usando elemento DOM directamente
+// const container = document.querySelector('.custom-layout-area')
+// const layout3 = initLayout(container, {
+//   role: 'custom',
+//   nestedContainers: false,
+//   styles: {
+//     backgroundColor: '#f0f0f0'
+//   }
+// })

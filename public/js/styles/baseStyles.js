@@ -17,7 +17,8 @@ export const createRoleBaseStyles = (role = 'content', styles = {}) => {
       right: '0',
       top: '0',
       height: '100vh',
-      width: '280px',
+      zIndex:2500,
+      
       gridTemplateColumns: '1fr',
       gridAutoRows: 'minmax(50px, auto)',
       backgroundColor: 'blue',
@@ -27,11 +28,9 @@ export const createRoleBaseStyles = (role = 'content', styles = {}) => {
       display: 'flex'
     },
     content: {
-      flex: '1',
-      padding: '20px',
-      gridAutoRows: 'minmax(100px, auto)',
-      overflow: 'auto',
-      backgroundColor: '#f5f5f5'
+      backgroundColor: '#f5f5f5',
+      padding: '16px',
+      minHeight: '200px'
     },
     footer: {
       position: 'fixed',
@@ -42,6 +41,16 @@ export const createRoleBaseStyles = (role = 'content', styles = {}) => {
       backgroundColor: '#2c3e50',
       color: 'white'
     },
+    page: {
+      display: 'grid',
+      gridTemplateColumns: '1fr',
+      gridAutoRows: 'minmax(50px, auto)',
+      padding: '10px',
+      backgroundColor: 'green',
+      minHeight: '100vh',
+      boxSizing: 'border-box',
+    },
+    
     custom: {}
   }
 
