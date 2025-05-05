@@ -1,0 +1,11 @@
+[debug] [2025-05-05T03:54:47.289Z] ----------------------------------------------------------------------
+[debug] [2025-05-05T03:54:47.292Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /nix/store/984bjqzf7prsischdc86jmqbn4ha5yxd-firebase-tools-14.2.0/lib/node_modules/firebase-tools/lib/bin/firebase.js deploy --debug
+[debug] [2025-05-05T03:54:47.292Z] CLI Version:   14.2.0
+[debug] [2025-05-05T03:54:47.293Z] Platform:      linux
+[debug] [2025-05-05T03:54:47.293Z] Node Version:  v20.18.1
+[debug] [2025-05-05T03:54:47.293Z] Time:          Mon May 05 2025 03:54:47 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-05-05T03:54:47.293Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-05T03:54:47.298Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[error] 
+[error] Error: Not in a Firebase app directory (could not locate firebase.json)
