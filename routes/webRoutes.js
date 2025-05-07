@@ -55,12 +55,5 @@ router.get('/', (req, res) =>
   req.user ? res.redirect('/dashboard') : res.redirect('/home')
 );
 
-// Fallback si no existe la ruta
-// router.get('*', (req, res) => {
-//   res.render('layout.njk', {
-//     title: 'Mi Aplicación',
-//     user: req.user || null,
-//   });
-// });
 
 export default router;

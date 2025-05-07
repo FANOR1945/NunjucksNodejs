@@ -1,40 +1,36 @@
-// 🌐 Core
+// 1. IMPORTACIONES BÁSICAS
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import helmet from 'helmet';
-import http from 'http'; // ⚠️ importante para socket.io
-
-// 🛢️ Config & DB
-import { connectDB } from './config/database.js';
-import session from 'express-session';
-import MongoStore from 'connect-mongo';
-
-// 🧠 Autenticación
-import passport from 'passport';
-import './config/passport.js';
-
-// 🖥️ Motor de plantillas
+import http from 'http';
 import nunjucks from 'nunjucks';
 
-// 📁 Rutas
-import webRoutes from './routes/webRoutes.js';
-import apiRoutes from './routes/apiRoutes.js';
+import { sessionMiddleware } from './config/sessionConfig.js';
 
-dotenv.config();
-
-const app = express();
-const server = http.createServer(app); // 📌 necesario para socket.io
-const { Server } = await import('socket.io');
-const io = new Server(server); // 💬 socket.io conectado
-
+// 2. CONFIGURACIÓN INICIAL
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config();
 const PORT = process.env.PORT || 3000;
+const app = express();
+const server = http.createServer(app);
 
+// 3. BASE DE DATOS
+import { connectDB } from './config/database.js';
 await connectDB();
 
+// 4. SESSION (EXTRAÍDA A config/sessionConfig.js)
+app.use(sessionMiddleware);
+
+// 5. PASSPORT
+import passport from 'passport';
+import './config/passport.js';
+app.use(passport.initialize());
+app.use(passport.session());
+
+// 6. NUNJUCKS
 nunjucks.configure(path.join(__dirname, 'views'), {
   autoescape: true,
   express: app,
@@ -42,46 +38,43 @@ nunjucks.configure(path.join(__dirname, 'views'), {
   noCache: process.env.NODE_ENV !== 'production'
 });
 
-// 🛠️ Middlewares
-const staticPath = process.env.NODE_ENV === 'production' 
-  ? path.join(__dirname, 'dist') 
-  : path.join(__dirname, 'public');
+// 7. MIDDLEWARES GENERALES
+app.use(helmet());
 
-app.use(express.static(staticPath));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
+// CSP con Nonce
 app.use((req, res, next) => {
-  const nonce = crypto.randomBytes(16).toString('base64');
+  // Generar un nonce seguro con SHA256
+  const nonce = crypto.randomBytes(16).toString('base64'); // 16 bytes aleatorios
   res.locals.nonce = nonce;
   res.setHeader(
     'Content-Security-Policy',
-    `default-src 'self'; script-src 'self' 'nonce-${nonce}' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self';`
+    `script-src 'self' 'nonce-${nonce}';`
   );
   next();
 });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-  })
-);
+// Archivos estáticos
+const staticPath = process.env.NODE_ENV === 'production'
+  ? path.join(__dirname, 'dist')
+  : path.join(__dirname, 'public');
+app.use(express.static(staticPath));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// JSON y Formularios
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// 🌐 Rutas
-app.use('/webRoutes', webRoutes);
+// 8. RUTAS
+import authRoutes from './routes/authRoutes.js';
+import apiRoutes from './routes/apiRoutes.js';
+import webRoutes from './routes/webRoutes.js';
+
+app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
-app.use(helmet());
+app.use('/webRoutes', webRoutes);
 
 app.get('/', (req, res) => {
   return req.user ? res.redirect('/dashboard') : res.redirect('/home');
 });
-
 app.get('*', (req, res) => {
   res.render('layout.njk', {
     title: 'Mi Aplicación',
@@ -90,22 +83,27 @@ app.get('*', (req, res) => {
     env: JSON.stringify({ NODE_ENV: process.env.NODE_ENV }),
   });
 });
-
-// 💬 Socket.IO events
-io.on('connection', (socket) => {
-  console.log('🟢 Cliente conectado:', socket.id);
-
-  socket.on('mensaje', (msg) => {
-    console.log('📩 Mensaje recibido:', msg);
-    io.emit('mensaje', msg); // reenviar a todos
-  });
-
-  socket.on('disconnect', () => {
-    console.log('🔴 Cliente desconectado:', socket.id);
+// 9. ERRORES
+app.use((req, res, next) => {
+  res.status(404).render('error.njk', {
+    title: 'Página no encontrada',
+    error: 'La página que buscas no existe'
   });
 });
 
-// 🚀 Iniciar servidor con socket.io
-server.listen(PORT, () =>
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`)
-);
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).render('error.njk', {
+    title: 'Error del servidor',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Ocurrió un error'
+  });
+});
+
+// 10. INICIO SERVIDOR (sin socket.io)
+server.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
+});
+
+
+

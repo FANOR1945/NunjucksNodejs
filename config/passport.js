@@ -1,24 +1,31 @@
+// config/passport.js
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
-import User from '../models/User.js';
+import User from '../models/userModel.js';
 
-passport.use(
-  new LocalStrategy(async (username, password, done) => {
+passport.use(new LocalStrategy(
+  async (username, password, done) => {
     try {
       const user = await User.findOne({ username });
-      if (!user) return done(null, false, { message: 'No existe' });
-      const match = await user.comparePassword(password);
-      return match
-        ? done(null, user)
-        : done(null, false, { message: 'Clave incorrecta' });
-    } catch (err) {
-      return done(err);
+      if (!user) return done(null, false, { message: 'Usuario no encontrado' });
+      
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) return done(null, false, { message: 'Contraseña incorrecta' });
+      
+      return done(null, user);
+    } catch (error) {
+      return done(error);
     }
-  })
-);
+  }
+));
 
+// Serialización del usuario
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
-  done(null, user);
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
 });

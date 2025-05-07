@@ -1,6 +1,4 @@
 import express from 'express';
-import passport from 'passport';
-import User from '../models/User.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -15,47 +13,6 @@ const env = nunjucks.configure(path.join(__dirname, '../views'), {
   noCache: process.env.NODE_ENV !== 'production'
 });
 
-// Autenticación
-router.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) return next(err);
-    if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
-
-    req.logIn(user, (err) => {
-      if (err) return next(err);
-      res.json({ 
-        message: 'Login exitoso', 
-        user: { 
-          username: user.username,
-          roles: user.roles 
-        } 
-      });
-    });
-  })(req, res, next);
-});
-
-router.post('/register', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = new User({ 
-      username, 
-      password, 
-      roles: ['user'] 
-    });
-    
-    await user.save();
-    res.json({
-      message: 'Usuario registrado con éxito.',
-      user: { username: user.username },
-    });
-  } catch (err) {
-    res.status(500).json({ 
-      error: err.code === 11000 
-        ? 'El nombre de usuario ya existe' 
-        : 'Error al registrar usuario' 
-    });
-  }
-});
 
 // Renderizado de templates
 router.post('/render-template', (req, res) => {
