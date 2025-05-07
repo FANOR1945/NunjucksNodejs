@@ -24,9 +24,9 @@ export function setupFreeDrag(element, isDraggable) {
       offsetY = startY - rect.top;
   
       requestAnimationFrame(() => {
-        element.style.position = 'fixed';
-        element.style.left = `${rect.left}px`;
-        element.style.top = `${rect.top}px`;
+         element.style.position = 'fixed';
+        // element.style.left = `${rect.left}px`;
+        // element.style.top = `${rect.top}px`;
         element.style.zIndex = '9999';
         element.style.cursor = 'grabbing';
         element.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';

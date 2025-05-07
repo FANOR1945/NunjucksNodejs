@@ -3,12 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DynamicLayout Example</title>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <script
+  type="module"
+  nonce="{{ nonce }}"
+  src="/{{ scriptPath }}"
+></script>
+{# <link rel="stylesheet" href="/css/styles.css" nonce="{{ nonce }}"> #}
+<title>{{ title }}</title>
+  
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
 
-  <script type="module" src="/js/main.js"></script>
+ 
+  </div>
+  <script
+      type="module"
+      nonce="{{ nonce }}"
+      src="/{{ scriptPath }}"
+    ></script>
 </body>
 </html>

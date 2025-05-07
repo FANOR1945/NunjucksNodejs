@@ -1,96 +1,48 @@
-html, body {
+/* index.css */
+html, body, #app {
   height: 100%;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(180deg, #241c34 0%, #3600b4 100%);
-  color: #f4f4f4;
-  /* IMPORTANTE para draggable: */
-  position: relative;
-  overflow: auto; /* Cambiado de hidden a auto */
+  background-color: aqua;
 }
 
-/* Contenedor principal del layout */
-#app-container {
-  position: relative;
+/* table.css */
+.dynamic-table {
   width: 100%;
-  height: 100%;
-  display: flex;
+  border-collapse: collapse;
+  table-layout: fixed;         /* reparte columnas equitativamente */
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  margin: 1rem 0;
 }
 
-#sidebar {
-  width: 240px;
-  position: fixed;
+.dynamic-table th,
+.dynamic-table td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dynamic-table th {
+  background-color: #2c3e50;
+  color: #fff;
+  font-weight: 600;
+  position: sticky;
   top: 0;
-  left: 0;
-  background: linear-gradient(180deg, #241c34 0%, #3600b4 100%);
-  color: white;
-  height: 100%;
-  padding-top: 20px;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-  overflow-y: auto;
-  z-index: 100; /* Asegura que esté sobre otros elementos */
 }
 
-#content {
-  margin-left: 260px;
-  padding: 30px;
-  min-height: 100vh;
-  width: calc(100% - 260px);
-  position: relative;
-  /* IMPORTANTE para draggable: */
-  overflow: visible; /* Permite que los elementos draggables salgan */
+.dynamic-table tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-/* ESTILOS DRAGGABLE MEJORADOS */
-.draggable-element {
-  transition: all 0.2s ease;
-  user-select: none;
-  position: absolute; /* Importante para el drag */
-  z-index: 10;
+.dynamic-table tr:hover {
+  background-color: #e0ebf5;
 }
 
-.draggable-element.dragging {
-  cursor: grabbing;
-  z-index: 1000;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-  transform: scale(1.02);
-  opacity: 0.95;
+.dynamic-table tfoot td {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  font-weight: 600;
 }
-
-.draggable-element:hover:not(.dragging) {
-  cursor: grab;
-  opacity: 0.9;
-  border-color: #FFC107 !important;
-}
-
-/* Contenedores draggable */
-.draggable-container {
-  position: relative;
-  transition: all 0.3s ease;
-  min-height: 50px;
-  background-color: rgba(255,255,255,0.05);
-  border: 1px dashed rgba(255,255,255,0.2);
-}
-
-.draggable-container.highlight {
-  background-color: rgba(0,0,0,0.1);
-  border: 2px dashed #6200ea;
-}
-
-/* Elementos durante el drop */
-.drop-target {
-  background-color: rgba(173, 255, 47, 0.2) !important;
-  border: 2px dashed #ADFF2F !important;
-}
-
-/* Ajustes para elementos hijos */
-.layout-element [data-type] {
-  transition: all 0.3s ease;
-}
-
-.layout-element [data-type]:hover {
-  background-color: rgba(173,255,47,0.2) !important;
-}
-

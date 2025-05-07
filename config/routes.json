@@ -1,4 +1,19 @@
 [
+  
+  {
+    "path": "/login",
+    "view": "auth/login.njk",
+    "title": "Iniciar Sesión",
+    "mdname": "Autenticación",
+    "private": false
+  },
+  {
+    "path": "/register",
+    "view": "auth/register.njk",
+    "title": "Registrarse",
+    "mdname": "Autenticación",
+    "private": false
+  },
   {
     "path": "/home",
     "view": "home.njk",
@@ -36,6 +51,7 @@
       }
     ]
   },
+  
   {
     "path": "/about",
     "view": "about.njk",

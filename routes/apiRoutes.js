@@ -4,80 +4,110 @@ import User from '../models/User.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import nunjucks from 'nunjucks';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 
-// Login
+// Configuración de Nunjucks para API
+const env = nunjucks.configure(path.join(__dirname, '../views'), {
+  autoescape: true,
+  noCache: process.env.NODE_ENV !== 'production'
+});
+
+// Autenticación
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) return next(err);
-    if (!user)
-      return res.status(401).json({ message: 'Credenciales inválidas' });
+    if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
 
     req.logIn(user, (err) => {
       if (err) return next(err);
-      res.json({ message: 'Login exitoso', user: { username: user.username } });
+      res.json({ 
+        message: 'Login exitoso', 
+        user: { 
+          username: user.username,
+          roles: user.roles 
+        } 
+      });
     });
   })(req, res, next);
 });
 
-// Registro
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
   try {
-    const user = new User({ username, password, roles: ['user'] });
+    const { username, password } = req.body;
+    const user = new User({ 
+      username, 
+      password, 
+      roles: ['user'] 
+    });
+    
     await user.save();
     res.json({
       message: 'Usuario registrado con éxito.',
       user: { username: user.username },
     });
   } catch (err) {
-    res.status(500).json({ error: 'Error al registrar usuario' });
+    res.status(500).json({ 
+      error: err.code === 11000 
+        ? 'El nombre de usuario ya existe' 
+        : 'Error al registrar usuario' 
+    });
   }
 });
 
-// Ruta pública para menú
-router.get('/routes', (req, res) => {
-  const routes = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../config/routes.json'))
-  );
-
-  const extractRoutesTree = (routesArray, parentPath = '') => {
-    return routesArray.map((route) => {
-      // Corregir la concatenación de las rutas
-      let fullPath = parentPath;
-      if (route.path.startsWith('/')) {
-        // Si la ruta comienza con '/', solo concatenamos el path sin añadir barra extra
-        fullPath += route.path;
-      } else {
-        // Si la ruta no comienza con '/', entonces añadimos '/' antes de la ruta
-        fullPath += '/' + route.path;
-      }
-
-      const result = {
-        path: fullPath,
-        view: route.view,
-        private: route.private,
-        title: route.title,
-        mdname: route.mdname || '',
-      };
-
-      if (route.children) {
-        result.children = extractRoutesTree(route.children, fullPath); // Pasar el fullPath correcto
-      }
-
-      return result;
+// Renderizado de templates
+router.post('/render-template', (req, res) => {
+  try {
+    const { template, context } = req.body;
+    const rendered = env.renderString(template, context || {});
+    res.json({ success: true, html: rendered });
+  } catch (error) {
+    console.error('Template rendering error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al renderizar la plantilla'
     });
-  };
+  }
+});
 
-  const allRoutes = extractRoutesTree(routes); // Usar la función corregida
-  const userLogged = !!req.user;
-  const filtered = allRoutes.filter((r) =>
-    userLogged ? r.private : !r.private
-  );
+// Gestión de rutas de la aplicación
+router.get('/routes', (req, res) => {
+  try {
+    const routes = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../config/routes.json'))
+    );
 
-  res.json(filtered);
+    const processRoutes = (routesArray, basePath = '') => {
+      return routesArray.map(route => {
+        const fullPath = path.join(basePath, route.path);
+        const result = {
+          path: fullPath,
+          view: route.view,
+          private: route.private || false,
+          title: route.title,
+          mdname: route.mdname || '',
+        };
+
+        if (route.children) {
+          result.children = processRoutes(route.children, fullPath);
+        }
+
+        return result;
+      });
+    };
+
+    const allRoutes = processRoutes(routes);
+    const filtered = allRoutes.filter(r => 
+      req.user ? r.private !== false : r.private === false
+    );
+
+    res.json(filtered);
+  } catch (err) {
+    console.error('Error loading routes:', err);
+    res.status(500).json({ error: 'Error al cargar las rutas' });
+  }
 });
 
 export default router;
