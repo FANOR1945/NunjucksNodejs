@@ -28,7 +28,7 @@ export const createLayoutPage = (routes, routeHandler, currentPath) => {
     elements: [
       navbarElement,
       createSidebar(routes, routeHandler, currentPath),
-      createContent(routes, currentPath,routeHandler,),
+      createContent(routes, routeHandler,currentPath),
       footerElement
     ]
   };

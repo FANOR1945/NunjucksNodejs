@@ -32,3 +32,12 @@ DATAGRID:DataGrid,
 export const getElementType = (type) => {
     return ELEMENT_TYPES[type?.toUpperCase()] || ELEMENT_TYPES.TEXT;
   };
+
+
+
+  export const createStandaloneComponent = (type, config = {}) => {
+    const Component = getElementType(type);
+    return typeof Component === 'function' 
+      ? Component(config)
+      : { ...Component, ...config };
+  };

@@ -13,17 +13,17 @@ export const handleRouteChange = async (path) => {
   updateBrowserPath(path);
 
   try {
-    const { router, auth } = store.getState();
+    const { routesUi, auth } = store.getState();
 
     // Protección de rutas
-    const route = router.routes.find(r => r.path === path);
+    const route = routesUi.routes.find(r => r.path === path);
     const requiresAuth = route?.meta?.requiresAuth;
 
     if (requiresAuth && !auth.isAuthenticated) {
       return navigate('/auth/login');
     }
 
-    const layout = createLayoutPage(router.routes, handleRouteChange, path);
+    const layout = createLayoutPage(routesUi.routes, handleRouteChange, path);
     initLayout([layout], '#app');
   } catch (error) {
     console.error('Error al cambiar ruta:', error);

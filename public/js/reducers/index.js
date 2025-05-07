@@ -6,7 +6,7 @@ import uiReducer from './uiReducer.js';
 
 // Crear el rootReducer combinando el itemsReducer
 const rootReducer = combineReducers({
-  router: routerReducer,
+  routesUi: routerReducer,
 
   auth: authReducer,
   ui: uiReducer,

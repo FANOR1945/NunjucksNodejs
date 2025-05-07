@@ -1,7 +1,7 @@
 import { routeControllers } from '../../controllers/uiRoutes/index.js';
 import { debugLog } from '../../debug.js';
 
-export const createContent = (routes, currentPath, routeHandler) => {
+export const createContent = (routes, routeHandler, currentPath,) => {
   const defaultContent = { 
     type: 'text', 
     content: 'Contenido no disponible', 

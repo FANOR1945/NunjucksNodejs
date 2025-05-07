@@ -61,7 +61,7 @@ app.use(express.static(staticPath));
 
 // JSON y Formularios
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // 8. RUTAS
 import authRoutes from './routes/authRoutes.js';
