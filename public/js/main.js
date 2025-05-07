@@ -1,4 +1,3 @@
-// src/main.js
 import { domReady } from './utils/dom.js';
 import { initLayout } from './init/initLayout.js';
 import { createLayoutPage } from './layouts/layoutPage/index.js';
@@ -7,23 +6,23 @@ import { fetchRoutes } from './services/api.js';
 import { createDebugUI } from './debug.js';
 import '../css/styles.css';
 
-let currentPath = '';
-let routes = [];
+import { store } from './store/index.js';
 
-// Utilidades de rutas
+// Utils
 const getCurrentPath = () => window.location.pathname;
 const updateBrowserPath = path => window.history.pushState({}, '', path);
 
-// Cambio de ruta sin spinner ni sockets
+// Manejo de rutas
 const handleRouteChange = async (path) => {
   updateBrowserPath(path);
-  currentPath = path;
+  store.dispatch({ type: 'SET_CURRENT_PATH', payload: path });
 
   try {
-    const layout = createLayoutPage(routes, handleRouteChange, path);
+    const { router } = store.getState();
+    const layout = createLayoutPage(router.routes, handleRouteChange, path);
     initLayout([layout], '#app');
   } catch (error) {
-    console.error('Error al cambiar ruta:', error);
+    console.error('Error al cambiar de ruta:', error);
     initLayout([{
       role: 'error',
       elements: [{
@@ -35,13 +34,16 @@ const handleRouteChange = async (path) => {
   }
 };
 
-// Inicializar la app
+// Inicializar app
 const initializeApp = async () => {
   try {
     createDebugUI();
 
-    routes = await fetchRoutes();
-    currentPath = getCurrentPath();
+    const routes = await fetchRoutes();
+    const currentPath = getCurrentPath();
+
+    store.dispatch({ type: 'SET_ROUTES', payload: routes });
+    store.dispatch({ type: 'SET_CURRENT_PATH', payload: currentPath });
 
     await handleRouteChange(currentPath);
 
@@ -50,7 +52,7 @@ const initializeApp = async () => {
     });
 
   } catch (error) {
-    console.error('Error al inicializar:', error);
+    console.error('Error al inicializar la app:', error);
     initLayout([{
       role: 'error',
       elements: [{
@@ -62,4 +64,5 @@ const initializeApp = async () => {
   }
 };
 
+// Esperar al DOM y arrancar
 domReady.then(initializeApp);
